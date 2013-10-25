@@ -1,0 +1,4 @@
+Software to stitch images
+-------------------------
+- Hugin
+- Autopano Pro
