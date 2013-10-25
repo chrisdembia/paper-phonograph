@@ -15,4 +15,7 @@ to your `~/.bashrc` file. For example, on my system, I have something like
 (http://superuser.com/questions/79612/setting-and-getting-windows-environment-variables-from-the-command-prompt)
 or http://support.microsoft.com/kb/310519.
 
+You can also set the environment variable temporarily in your session of python
+via::
 
+   `>>> import os; os.environ['PAPER_PHONOGRAPH_DROPBOX'] = '/path/to/'
