@@ -12,11 +12,13 @@ import Image
 from pylab import imshow, gray
 
 from sklearn import svm, metrics
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
 
 # Data input.
 # -----------
-Y_train = 16 * [-1] + 18 * [1]
-Y_test = 7 * [-1] + 8 * [1]
+Y_train = 16 * [0] + 18 * [1]
+Y_test = 7 * [0] + 8 * [1]
 
 class_names = ['ambient', '300', '424', '1000', '1414']
 
@@ -94,21 +96,32 @@ def prepare_X(image_fnames):
     return images.reshape((n_images, -1))
 
 
-# Train.
-# ------
+# Prepare data.
 X_train = prepare_X(training_images_fnames)
-classifier = svm.SVC(gamma=0.001)
-classifier.fit(X_train, Y_train)
-
-# Test.
-# -----
 X_test = prepare_X(test_images_fnames)
-Y_predicted = classifier.predict(X_test)
+
+def quick_classification_test(name, classifier):
+    print '\nClassifying using %s...' % name
+    print '==================================================================='
+
+    # Train.
+    classifier.fit(X_train, Y_train)
+    # Test.
+    Y_predicted = classifier.predict(X_test)
+
+    # Report results.
+    # ---------------
+    print "Actual:\n", Y_test
+    print "Prediction:\n", Y_predicted
+    print "Classification report:\n", metrics.classification_report(Y_test,
+            Y_predicted)
+    print "Confusion matrix:\n", metrics.confusion_matrix(Y_test, Y_predicted)
 
 
-# Report results.
-# ---------------
-print "Prediction:\n", Y_predicted
-print "Classification report:\n", metrics.classification_report(Y_test,
-        Y_predicted)
-print "Confusion matrix:\n", metrics.confusion_matrix(Y_test, Y_predicted)
+#quick_classification_test('SVM gamma = 0.001', svm.SVC(gamma=0.001))
+#quick_classification_test('SVM gamma = 0.01', svm.SVC(gamma=0.01))
+quick_classification_test('GaussianNB', GaussianNB())
+quick_classification_test('K nearest neighbors', KNeighborsClassifier())
+
+
+
