@@ -5,6 +5,9 @@ python splitstitched.py <trial-num> <letter>
 For example:
     python splitstitched.py 49 C
 
+Looks for the stitched images in
+$PAPER_PHONOGRAPH_DROPBOX/data/microscopy-split.
+
 """
 
 import os
@@ -77,8 +80,10 @@ for i in range(num_images):
     f.write('%i %i\n' % (i, pixels_off_top))
 
     # Row indices.
-    r_min = pixels_off_top
-    r_max = min(img_height, r_min + output_height)
+    # We do some min/max stuff to override the user's input and ensure the
+    # images have the correct dimension.
+    r_max = min(img_height, pixels_off_top + output_height)
+    r_min = r_max - output_height
 
     # Get subset of image.
     img_subset = img[r_min:r_max, c_min:c_max]
