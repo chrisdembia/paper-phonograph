@@ -15,8 +15,8 @@ from sklearn import svm, metrics
 
 # Data input.
 # -----------
-Y_train = 11 * [-1] + 13 * [1]
-Y_test = 12 * [-1] + 13 * [1]
+Y_train = 16 * [-1] + 18 * [1]
+Y_test = 7 * [-1] + 8 * [1]
 
 class_names = ['ambient', '300', '424', '1000', '1414']
 
@@ -36,6 +36,11 @@ training_images_fnames = [
         'trial_19_D/trial_19_D_8.tif',  
         'trial_19_D/trial_19_D_9.tif',  
         'trial_19_D/trial_19_D_10.tif', 
+        'trial_19_D/trial_19_D_11.tif', 
+        'trial_19_D/trial_19_D_12.tif', 
+        'trial_19_D/trial_19_D_13.tif', 
+        'trial_19_D/trial_19_D_14.tif', 
+        'trial_19_D/trial_19_D_15.tif', 
         'trial_21_C/trial_21_C_0.tif',  
         'trial_21_C/trial_21_C_1.tif',  
         'trial_21_C/trial_21_C_2.tif',  
@@ -49,14 +54,14 @@ training_images_fnames = [
         'trial_21_C/trial_21_C_10.tif', 
         'trial_21_C/trial_21_C_11.tif', 
         'trial_21_C/trial_21_C_12.tif', 
+        'trial_21_C/trial_21_C_13.tif', 
+        'trial_21_C/trial_21_C_14.tif', 
+        'trial_21_C/trial_21_C_15.tif', 
+        'trial_21_C/trial_21_C_16.tif', 
+        'trial_21_C/trial_21_C_17.tif', 
         ]
 
 test_images_fnames = [
-        'trial_19_D/trial_19_D_11.tif', 
-        'trial_19_D/trial_19_D_12.tif', 
-        'trial_19_D/trial_19_D_13.tif', 
-        'trial_19_D/trial_19_D_14.tif', 
-        'trial_19_D/trial_19_D_15.tif', 
         'trial_19_D/trial_19_D_16.tif', 
         'trial_19_D/trial_19_D_17.tif', 
         'trial_19_D/trial_19_D_18.tif', 
@@ -64,11 +69,6 @@ test_images_fnames = [
         'trial_19_D/trial_19_D_20.tif', 
         'trial_19_D/trial_19_D_21.tif', 
         'trial_19_D/trial_19_D_22.tif', 
-        'trial_21_C/trial_21_C_13.tif', 
-        'trial_21_C/trial_21_C_14.tif', 
-        'trial_21_C/trial_21_C_15.tif', 
-        'trial_21_C/trial_21_C_16.tif', 
-        'trial_21_C/trial_21_C_17.tif', 
         'trial_21_C/trial_21_C_18.tif', 
         'trial_21_C/trial_21_C_19.tif', 
         'trial_21_C/trial_21_C_20.tif', 
@@ -87,6 +87,9 @@ def prepare_X(image_fnames):
     # creates a matrix that goes through the following shapes:
     # (r x c x n) --> (n x c x r) --> (n x r x c)
     images = np.dstack(images_tuple).swapaxes(0, 2).swapaxes(1, 2)
+    # Convert the data into a format that the algorithms prefer:
+    # http://scikit-learn.org/stable/datasets/#sample-images
+    images_floating_point = np.array(images, dtype=np.float64) / 255.
     n_images = len(image_fnames)
     return images.reshape((n_images, -1))
 
