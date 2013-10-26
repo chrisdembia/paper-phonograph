@@ -1,6 +1,9 @@
-""" python splitstitched.py <trial-num> <letter> <pixels-off-top>
+"""Interactively select how to split up a stitched image.
 
-TODO 
+python splitstitched.py <trial-num> <letter>
+
+For example:
+    python splitstitched.py 49 C
 
 """
 
@@ -9,11 +12,12 @@ import sys
 import getpass
 
 import numpy as np
+import pylab as pl
+from matplotlib import pyplot
 import Image
 
 trial_num = sys.argv[1]
 letter = sys.argv[2]
-pixels_off_top = int(sys.argv[3])
 
 # Dimensions of each output image.
 output_height = 1500
@@ -40,22 +44,62 @@ if not os.path.exists(out_path): os.makedirs(out_path)
 # Write a log.
 f = open(os.path.join(out_path, 'README.txt'), 'w')
 f.write('Directory created by %s by running:\n' % getpass.getuser())
-f.write('python splitstitched.py %s %s %i' % (trial_num, letter,
-    pixels_off_top))
-f.close()
+f.write('python splitstitched.py %s %s\n' % (trial_num, letter))
+f.write('Mouse inputs:\n')
 
-for i in range(int(img_width / output_width)):
-    # Row indices.
-    r_min = pixels_off_top
-    r_max = pixels_off_top + output_height
+fig = pl.figure()
+ax = fig.add_subplot(211)
+ax2 = fig.add_subplot(212)
+
+# In the images shown in the interactive window, decrease resolution by the
+# following integer factor:
+dec_res = 20
+
+num_images = int(img_width / output_width)
+for i in range(num_images):
+
     # Column indices.
     c_min = i * output_width
     c_max = (i + 1) * output_width
-    
+
+    # Draw a slice of the image, and ask the user which subset to crop out.
+    ax.clear()
+    ax.set_title('Click to define top edge of the to-be-cropped-out '
+            'image for this slice (%i/%i).' % (i + 1, num_images))
+    ax.imshow(img[::dec_res, c_min:c_max:dec_res])
+    pl.xticks([])
+    pl.yticks([])
+    # Need this so that the plot is updated IMMEDIATELY:
+    pl.draw()
+    coord = pl.ginput()[0]
+    pixels_off_top = np.floor(coord[1] * dec_res)
+
+    f.write('%i %i\n' % (i, pixels_off_top))
+
+    # Row indices.
+    r_min = pixels_off_top
+    r_max = min(img_height, r_min + output_height)
+
     # Get subset of image.
     img_subset = img[r_min:r_max, c_min:c_max]
+
+    # Show cropped image, but at a lower resolution for speed.
+    ax2.clear()
+    ax2.set_title('Previous image (%i), after cropping:' % (i + 1))
+    ax2.imshow(img_subset[::dec_res, ::dec_res])
+    pl.xticks([])
+    pl.yticks([])
+    # Need this so that the plot is updated IMMEDIATELY:
+    pl.draw()
 
     # Save to file.
     Image.fromarray(img_subset).save(os.path.join(out_path, '%s_%i.tif' %
         (orig_fname, i)))
 
+ax.clear()
+ax2.clear()
+ax.set_title('All done! You can close the plot window now.')
+pl.draw()
+
+pl.show()
+f.close()
