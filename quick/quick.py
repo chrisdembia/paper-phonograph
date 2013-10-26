@@ -15,8 +15,8 @@ from sklearn import svm, metrics
 
 # Data input.
 # -----------
-Y_train = 11 * [0] + 13 * [1]
-Y_test = 12 * [0] + 13 * [1]
+Y_train = 11 * [-1] + 13 * [1]
+Y_test = 12 * [-1] + 13 * [1]
 
 class_names = ['ambient', '300', '424', '1000', '1414']
 
@@ -83,7 +83,6 @@ def prepare_X(image_fnames):
     # Each element is an r x c image.
     images_tuple = tuple(np.array(Image.open(os.path.join(data_dir, fname)))
                 for fname in image_fnames)
-    print 'DEBUG0', np.dstack(images_tuple).shape
     # If n is the number of images (length of this tuple), then the next line
     # creates a matrix that goes through the following shapes:
     # (r x c x n) --> (n x c x r) --> (n x r x c)
@@ -98,7 +97,6 @@ X_train = prepare_X(training_images_fnames)
 classifier = svm.SVC(gamma=0.001)
 classifier.fit(X_train, Y_train)
 
-print 'DEBUG1'
 # Test.
 # -----
 X_test = prepare_X(test_images_fnames)
