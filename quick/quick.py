@@ -18,68 +18,72 @@ from sklearn.preprocessing import Binarizer
 
 # Data input.
 # -----------
-Y_train = 16 * [0] + 18 * [1]
-Y_test = 7 * [0] + 8 * [1]
 
 class_names = ['ambient', '300', '424', '1000', '1414']
 
 data_dir = os.path.join(os.environ['PAPER_PHONOGRAPH_DROPBOX'], 'data',
         'microscopy-split')
 
-training_images_fnames = [
-        'trial_19_D/trial_19_D_0.tif',  
-        'trial_19_D/trial_19_D_1.tif',  
-        'trial_19_D/trial_19_D_2.tif',  
-        'trial_19_D/trial_19_D_3.tif',  
-        'trial_19_D/trial_19_D_4.tif',  
-        'trial_19_D/trial_19_D_5.tif',  
-        'trial_19_D/trial_19_D_6.tif',  
-        'trial_19_D/trial_19_D_7.tif',  
-        'trial_19_D/trial_19_D_8.tif',  
-        'trial_19_D/trial_19_D_9.tif',  
-        'trial_19_D/trial_19_D_10.tif', 
-        'trial_19_D/trial_19_D_11.tif', 
-        'trial_19_D/trial_19_D_12.tif', 
-        'trial_19_D/trial_19_D_13.tif', 
-        'trial_19_D/trial_19_D_14.tif', 
-        'trial_19_D/trial_19_D_15.tif', 
-        'trial_21_C/trial_21_C_0.tif',  
-        'trial_21_C/trial_21_C_1.tif',  
-        'trial_21_C/trial_21_C_2.tif',  
-        'trial_21_C/trial_21_C_3.tif',  
-        'trial_21_C/trial_21_C_4.tif',  
-        'trial_21_C/trial_21_C_5.tif',  
-        'trial_21_C/trial_21_C_6.tif',  
-        'trial_21_C/trial_21_C_7.tif',  
-        'trial_21_C/trial_21_C_8.tif',  
-        'trial_21_C/trial_21_C_9.tif',  
-        'trial_21_C/trial_21_C_10.tif', 
-        'trial_21_C/trial_21_C_11.tif', 
-        'trial_21_C/trial_21_C_12.tif', 
-        'trial_21_C/trial_21_C_13.tif', 
-        'trial_21_C/trial_21_C_14.tif', 
-        'trial_21_C/trial_21_C_15.tif', 
-        'trial_21_C/trial_21_C_16.tif', 
-        'trial_21_C/trial_21_C_17.tif', 
-        ]
+training_data = {
+        'trial_19_D/trial_19_D_0.tif': 0,  
+        'trial_19_D/trial_19_D_1.tif': 0,  
+        'trial_19_D/trial_19_D_2.tif': 0,  
+        'trial_19_D/trial_19_D_3.tif': 0,  
+        'trial_19_D/trial_19_D_4.tif': 0,  
+        'trial_19_D/trial_19_D_5.tif': 0,  
+        'trial_19_D/trial_19_D_6.tif': 0,  
+        'trial_19_D/trial_19_D_7.tif': 0,  
+        'trial_19_D/trial_19_D_8.tif': 0,  
+        'trial_19_D/trial_19_D_9.tif': 0,  
+        'trial_19_D/trial_19_D_10.tif': 0, 
+        'trial_19_D/trial_19_D_11.tif': 0, 
+        'trial_19_D/trial_19_D_12.tif': 0, 
+        'trial_21_C/trial_21_C_0.tif': 1,  
+        'trial_21_C/trial_21_C_1.tif': 1,  
+        'trial_21_C/trial_21_C_2.tif': 1,  
+        'trial_21_C/trial_21_C_3.tif': 1,  
+        'trial_21_C/trial_21_C_4.tif': 1,  
+        'trial_21_C/trial_21_C_5.tif': 1,  
+        'trial_21_C/trial_21_C_6.tif': 1,  
+        'trial_21_C/trial_21_C_7.tif': 1,  
+        'trial_21_C/trial_21_C_8.tif': 1,  
+        'trial_21_C/trial_21_C_9.tif': 1,  
+        'trial_21_C/trial_21_C_10.tif': 1, 
+        'trial_21_C/trial_21_C_11.tif': 1, 
+        'trial_21_C/trial_21_C_12.tif': 1, 
+        'trial_21_C/trial_21_C_13.tif': 1, 
+        'trial_19_D/trial_19_D_13.tif': 0, 
+        'trial_19_D/trial_19_D_14.tif': 0, 
+        'trial_19_D/trial_19_D_15.tif': 0, 
+        'trial_19_D/trial_19_D_16.tif': 0, 
+        'trial_19_D/trial_19_D_17.tif': 0, 
+        'trial_21_C/trial_21_C_19.tif': 1, 
+        'trial_21_C/trial_21_C_20.tif': 1, 
+        'trial_21_C/trial_21_C_21.tif': 1, 
+        'trial_21_C/trial_21_C_22.tif': 1, 
+        'trial_21_C/trial_21_C_23.tif': 1, 
+        'trial_21_C/trial_21_C_24.tif': 1, 
+        'trial_21_C/trial_21_C_25.tif': 1, 
+        }
 
-test_images_fnames = [
-        'trial_19_D/trial_19_D_16.tif', 
-        'trial_19_D/trial_19_D_17.tif', 
-        'trial_19_D/trial_19_D_18.tif', 
-        'trial_19_D/trial_19_D_19.tif', 
-        'trial_19_D/trial_19_D_20.tif', 
-        'trial_19_D/trial_19_D_21.tif', 
-        'trial_19_D/trial_19_D_22.tif', 
-        'trial_21_C/trial_21_C_18.tif', 
-        'trial_21_C/trial_21_C_19.tif', 
-        'trial_21_C/trial_21_C_20.tif', 
-        'trial_21_C/trial_21_C_21.tif', 
-        'trial_21_C/trial_21_C_22.tif', 
-        'trial_21_C/trial_21_C_23.tif', 
-        'trial_21_C/trial_21_C_24.tif', 
-        'trial_21_C/trial_21_C_25.tif', 
-        ]
+test_data = {
+        'trial_19_D/trial_19_D_18.tif': 0, 
+        'trial_19_D/trial_19_D_19.tif': 0, 
+        'trial_19_D/trial_19_D_20.tif': 0, 
+        'trial_19_D/trial_19_D_21.tif': 0, 
+        'trial_19_D/trial_19_D_22.tif': 0, 
+        'trial_21_C/trial_21_C_14.tif': 1, 
+        'trial_21_C/trial_21_C_15.tif': 1, 
+        'trial_21_C/trial_21_C_16.tif': 1, 
+        'trial_21_C/trial_21_C_17.tif': 1, 
+        'trial_21_C/trial_21_C_18.tif': 1, 
+        }
+
+training_images_fnames = training_data.keys()
+test_images_fnames = test_data.keys()
+
+y_train = training_data.values()
+y_test = test_data.values()
 
 binarizer = Binarizer(threshold=0.3)
 def prepare_X(image_fnames):
@@ -110,18 +114,18 @@ def quick_classification_test(name, classifier):
     print '==================================================================='
 
     # Train.
-    classifier.fit(X_train, Y_train)
+    classifier.fit(X_train, y_train)
     # Test.
-    Y_predicted = classifier.predict(X_test)
+    y_predicted = classifier.predict(X_test)
 
     # Report results.
     # ---------------
-    #print "Actual:\n", Y_test
-    #print "Prediction:\n", Y_predicted
-    #print "Classification report:\n", metrics.classification_report(Y_test,
-    #        Y_predicted)
-    #print "Confusion matrix:\n", metrics.confusion_matrix(Y_test, Y_predicted)
-    err = sum(np.array(Y_test) != Y_predicted) / float(len(Y_predicted))
+    #print "Actual:\n", y_test
+    #print "Prediction:\n", y_predicted
+    #print "Classification report:\n", metrics.classification_report(y_test,
+    #        y_predicted)
+    #print "Confusion matrix:\n", metrics.confusion_matrix(y_test, y_predicted)
+    err = sum(np.array(y_test) != y_predicted) / float(len(y_predicted))
     print "Error:", err
 
 #quick_classification_test('SVM', svm.SVC())
