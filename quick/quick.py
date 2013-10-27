@@ -14,6 +14,7 @@ from pylab import imshow, gray
 from sklearn import svm, metrics
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import Binarizer
 
 # Data input.
 # -----------
@@ -25,7 +26,6 @@ class_names = ['ambient', '300', '424', '1000', '1414']
 data_dir = os.path.join(os.environ['PAPER_PHONOGRAPH_DROPBOX'], 'data',
         'microscopy-split')
 
-# TODO imshow(os.path.join(data_dir, 'trial_49_C.tif'))
 training_images_fnames = [
         'trial_19_D/trial_19_D_0.tif',  
         'trial_19_D/trial_19_D_1.tif',  
@@ -81,6 +81,7 @@ test_images_fnames = [
         'trial_21_C/trial_21_C_25.tif', 
         ]
 
+binarizer = Binarizer(threshold=0.3)
 def prepare_X(image_fnames):
     # Each element is an r x c image.
     images_tuple = tuple(np.array(Image.open(os.path.join(data_dir, fname)))
@@ -93,7 +94,11 @@ def prepare_X(image_fnames):
     # http://scikit-learn.org/stable/datasets/#sample-images
     images_floating_point = np.array(images, dtype=np.float64) / 255.
     n_images = len(image_fnames)
-    return images_floating_point.reshape((n_images, -1))
+    images_2d = images_floating_point.reshape((n_images, -1))
+    # Binarization took a long time.
+    # X_transformed = binarizer.transform(images_floating_point)
+    X_transformed = (images_2d > 0.3).astype(float)
+    return X_transformed
 
 
 # Prepare data.
@@ -111,19 +116,19 @@ def quick_classification_test(name, classifier):
 
     # Report results.
     # ---------------
-    print "Actual:\n", Y_test
-    print "Prediction:\n", Y_predicted
-    print "Classification report:\n", metrics.classification_report(Y_test,
-            Y_predicted)
-    print "Confusion matrix:\n", metrics.confusion_matrix(Y_test, Y_predicted)
+    #print "Actual:\n", Y_test
+    #print "Prediction:\n", Y_predicted
+    #print "Classification report:\n", metrics.classification_report(Y_test,
+    #        Y_predicted)
+    #print "Confusion matrix:\n", metrics.confusion_matrix(Y_test, Y_predicted)
     err = sum(np.array(Y_test) != Y_predicted) / float(len(Y_predicted))
-    print "Error: \n", err
+    print "Error:", err
 
-quick_classification_test('SVM gamma', svm.SVC())
-quick_classification_test('SVM gamma = 0.001', svm.SVC(gamma=0.001))
-quick_classification_test('SVM gamma = 0.01', svm.SVC(gamma=0.01))
-quick_classification_test('GaussianNB', GaussianNB())
-quick_classification_test('K nearest neighbors', KNeighborsClassifier())
+#quick_classification_test('SVM', svm.SVC())
+#quick_classification_test('SVM gamma = 0.001', svm.SVC(gamma=0.001))
+#quick_classification_test('SVM gamma = 0.01', svm.SVC(gamma=0.01))
+#quick_classification_test('GaussianNB', GaussianNB())
+quick_classification_test('K nearest neighbors', KNeighborsClassifier(n_neighbors=6))
 
 
 
