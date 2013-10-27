@@ -93,7 +93,7 @@ def prepare_X(image_fnames):
     # http://scikit-learn.org/stable/datasets/#sample-images
     images_floating_point = np.array(images, dtype=np.float64) / 255.
     n_images = len(image_fnames)
-    return images.reshape((n_images, -1))
+    return images_floating_point.reshape((n_images, -1))
 
 
 # Prepare data.
@@ -116,10 +116,12 @@ def quick_classification_test(name, classifier):
     print "Classification report:\n", metrics.classification_report(Y_test,
             Y_predicted)
     print "Confusion matrix:\n", metrics.confusion_matrix(Y_test, Y_predicted)
+    err = sum(np.array(Y_test) != Y_predicted) / float(len(Y_predicted))
+    print "Error: \n", err
 
-
-#quick_classification_test('SVM gamma = 0.001', svm.SVC(gamma=0.001))
-#quick_classification_test('SVM gamma = 0.01', svm.SVC(gamma=0.01))
+quick_classification_test('SVM gamma', svm.SVC())
+quick_classification_test('SVM gamma = 0.001', svm.SVC(gamma=0.001))
+quick_classification_test('SVM gamma = 0.01', svm.SVC(gamma=0.01))
 quick_classification_test('GaussianNB', GaussianNB())
 quick_classification_test('K nearest neighbors', KNeighborsClassifier())
 
