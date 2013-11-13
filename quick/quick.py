@@ -15,16 +15,17 @@ from sklearn import svm, metrics
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import Binarizer
+from sklearn import cross_validation
+
 
 # Data input.
 # -----------
-
 class_names = ['ambient', '300', '424', '1000', '1414']
 
 data_dir = os.path.join(os.environ['PAPER_PHONOGRAPH_DROPBOX'], 'data',
         'microscopy-split')
 
-training_data = {
+data = {
         'trial_19_D/trial_19_D_0.tif': 0,  
         'trial_19_D/trial_19_D_1.tif': 0,  
         'trial_19_D/trial_19_D_2.tif': 0,  
@@ -38,6 +39,16 @@ training_data = {
         'trial_19_D/trial_19_D_10.tif': 0, 
         'trial_19_D/trial_19_D_11.tif': 0, 
         'trial_19_D/trial_19_D_12.tif': 0, 
+        'trial_19_D/trial_19_D_13.tif': 0, 
+        'trial_19_D/trial_19_D_14.tif': 0, 
+        'trial_19_D/trial_19_D_15.tif': 0, 
+        'trial_19_D/trial_19_D_16.tif': 0, 
+        'trial_19_D/trial_19_D_17.tif': 0, 
+        'trial_19_D/trial_19_D_18.tif': 0, 
+        'trial_19_D/trial_19_D_19.tif': 0, 
+        'trial_19_D/trial_19_D_20.tif': 0, 
+        'trial_19_D/trial_19_D_21.tif': 0, 
+        'trial_19_D/trial_19_D_22.tif': 0, 
         'trial_21_C/trial_21_C_0.tif': 1,  
         'trial_21_C/trial_21_C_1.tif': 1,  
         'trial_21_C/trial_21_C_2.tif': 1,  
@@ -52,11 +63,11 @@ training_data = {
         'trial_21_C/trial_21_C_11.tif': 1, 
         'trial_21_C/trial_21_C_12.tif': 1, 
         'trial_21_C/trial_21_C_13.tif': 1, 
-        'trial_19_D/trial_19_D_13.tif': 0, 
-        'trial_19_D/trial_19_D_14.tif': 0, 
-        'trial_19_D/trial_19_D_15.tif': 0, 
-        'trial_19_D/trial_19_D_16.tif': 0, 
-        'trial_19_D/trial_19_D_17.tif': 0, 
+        'trial_21_C/trial_21_C_14.tif': 1, 
+        'trial_21_C/trial_21_C_15.tif': 1, 
+        'trial_21_C/trial_21_C_16.tif': 1, 
+        'trial_21_C/trial_21_C_17.tif': 1, 
+        'trial_21_C/trial_21_C_18.tif': 1, 
         'trial_21_C/trial_21_C_19.tif': 1, 
         'trial_21_C/trial_21_C_20.tif': 1, 
         'trial_21_C/trial_21_C_21.tif': 1, 
@@ -66,26 +77,10 @@ training_data = {
         'trial_21_C/trial_21_C_25.tif': 1, 
         }
 
-test_data = {
-        'trial_19_D/trial_19_D_18.tif': 0, 
-        'trial_19_D/trial_19_D_19.tif': 0, 
-        'trial_19_D/trial_19_D_20.tif': 0, 
-        'trial_19_D/trial_19_D_21.tif': 0, 
-        'trial_19_D/trial_19_D_22.tif': 0, 
-        'trial_21_C/trial_21_C_14.tif': 1, 
-        'trial_21_C/trial_21_C_15.tif': 1, 
-        'trial_21_C/trial_21_C_16.tif': 1, 
-        'trial_21_C/trial_21_C_17.tif': 1, 
-        'trial_21_C/trial_21_C_18.tif': 1, 
-        }
+all_image_fnames = data.keys()
+y = np.array(data.values())
 
-training_images_fnames = training_data.keys()
-test_images_fnames = test_data.keys()
-
-y_train = training_data.values()
-y_test = test_data.values()
-
-binarizer = Binarizer(threshold=0.3)
+#binarizer = Binarizer(threshold=0.3)
 def prepare_X(image_fnames):
     # Each element is an r x c image.
     images_tuple = tuple(np.array(Image.open(os.path.join(data_dir, fname)))
@@ -106,8 +101,11 @@ def prepare_X(image_fnames):
 
 
 # Prepare data.
-X_train = prepare_X(training_images_fnames)
-X_test = prepare_X(test_images_fnames)
+#X_train = prepare_X(training_images_fnames)
+#X_test = prepare_X(test_images_fnames)
+X = prepare_X(all_image_fnames)
+X_train, X_test, y_train, y_test = cross_validation.train_test_split(
+        X, y, test_size=0.4, random_state=0)
 
 def quick_classification_test(name, classifier):
     print '\nClassifying using %s...' % name
@@ -128,11 +126,19 @@ def quick_classification_test(name, classifier):
     err = sum(np.array(y_test) != y_predicted) / float(len(y_predicted))
     print "Error:", err
 
-#quick_classification_test('SVM', svm.SVC())
-#quick_classification_test('SVM gamma = 0.001', svm.SVC(gamma=0.001))
-#quick_classification_test('SVM gamma = 0.01', svm.SVC(gamma=0.01))
-#quick_classification_test('GaussianNB', GaussianNB())
-quick_classification_test('K nearest neighbors', KNeighborsClassifier(n_neighbors=6))
+def cross_validate(name, classifier):
+    cv = cross_validation.LeaveOneOut(len(y))
+    scores = cross_validation.cross_val_score(classifier, X, y, cv=5)
+    print '\nCross-validating using %s...' % name
+    print '==================================================================='
+    print 'Accuracy: %0.2f (+/- %0.2f)' % (scores.mean(), scores.std())
+
+
+#cross_validate('SVM', svm.SVC())
+#cross_validate('SVM gamma = 0.001', svm.SVC(gamma=0.001))
+#cross_validate('SVM gamma = 0.01', svm.SVC(gamma=0.01))
+#cross_validate('GaussianNB', GaussianNB())
+cross_validate('K nearest neighbors', KNeighborsClassifier(n_neighbors=6))
 
 
 
